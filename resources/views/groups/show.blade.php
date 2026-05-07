@@ -1,4 +1,4 @@
-<x-layouts.app :title="$group->name" hero="short">
+<x-layouts.app :title="$group->name">
     <x-header-bar :title="$group->name" :back="route('groups.index')">
         <a href="{{ route('groups.settle', $group) }}" class="chip text-stone-900 text-xs">{{ __('app.settle_up') }}</a>
     </x-header-bar>

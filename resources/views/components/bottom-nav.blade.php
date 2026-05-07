@@ -9,7 +9,7 @@
         <a href="{{ route('accounts.index') }}" class="{{ str_starts_with($r, 'accounts') ? 'active' : '' }}" aria-label="Wallets">
             <x-icon name="wallet" :size="22" />
         </a>
-        <a href="{{ route('quick-add') }}" class="add-fab" aria-label="Add">
+        <a href="{{ route('transactions.create') }}?type=expense" class="add-fab" aria-label="Add">
             <x-icon name="plus" :size="26" :stroke="2.6" />
         </a>
         <a href="{{ route('reports.index') }}" class="{{ str_starts_with($r, 'reports') ? 'active' : '' }}" aria-label="Reports">

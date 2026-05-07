@@ -1,8 +1,8 @@
-<x-layouts.app :title="__('app.groups')" hero="short">
+<x-layouts.app :title="__('app.groups')">
     <x-header-bar :title="__('app.groups')" :back="route('dashboard')" />
 
     <div class="px-5">
-        <p class="text-white/85 text-sm mb-3">عندك في {{ $groups->count() }} مجموعة.</p>
+        <p class="text-stone-500 text-sm mb-3">عندك في {{ $groups->count() }} مجموعة.</p>
 
         <div class="space-y-3">
             @foreach ($groups as $g)

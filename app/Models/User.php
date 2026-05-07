@@ -106,10 +106,10 @@ class User extends Authenticatable
     {
         if ($this->accounts()->count() > 0) return;
         $defs = [
-            ['name' => 'كاش',           'type' => 'cash',   'icon' => '💵', 'color' => '#16A34A', 'institution' => null],
-            ['name' => 'حساب بنكي',     'type' => 'bank',   'icon' => '🏦', 'color' => '#3B82F6', 'institution' => null],
-            ['name' => 'فودافون كاش',   'type' => 'wallet', 'icon' => '📱', 'color' => '#EF4444', 'institution' => 'Vodafone Cash'],
-            ['name' => 'إنستا باي',     'type' => 'wallet', 'icon' => '🟣', 'color' => '#8B5CF6', 'institution' => 'InstaPay'],
+            ['name' => 'كاش',           'type' => 'cash',   'icon' => '', 'color' => '#0F3D2E', 'institution' => null],
+            ['name' => 'حساب بنكي',     'type' => 'bank',   'icon' => '', 'color' => '#1E2A78', 'institution' => null],
+            ['name' => 'فودافون كاش',   'type' => 'wallet', 'icon' => '', 'color' => '#7A1818', 'institution' => 'Vodafone Cash'],
+            ['name' => 'إنستا باي',     'type' => 'wallet', 'icon' => '', 'color' => '#3B1E78', 'institution' => 'InstaPay'],
         ];
         foreach ($defs as $d) {
             Account::create([

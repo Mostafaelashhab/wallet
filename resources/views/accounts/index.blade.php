@@ -1,34 +1,41 @@
-<x-layouts.app title="المحافظ" hero="tall">
-    <x-header-bar title="المحافظ" :back="route('dashboard')" />
+<x-layouts.app :title="__('app.wallets')">
+    <x-header-bar :title="__('app.wallets')" :back="route('dashboard')" />
 
-    <div class="px-5 -mt-2">
-        <div class="text-center text-white">
-            <p class="text-xs opacity-80">صافي الرصيد</p>
-            <p class="text-4xl font-extrabold mt-1">{{ number_format($netWorth, 2) }} <span class="text-base text-white/70">EGP</span></p>
+    <div class="px-5">
+        <div class="text-center mt-2">
+            <p class="text-white/55 text-xs uppercase tracking-widest">{{ __('app.wallet_total') }}</p>
+            <p class="display-amount text-white text-4xl mt-1">
+                {{ number_format($netWorth, 2) }}
+                <span class="text-base text-white/40 font-semibold">{{ __('app.currency_symbol') }}</span>
+            </p>
+            <p class="text-white/40 text-[11px] mt-1">{{ $accounts->count() }} {{ __('app.wallets_active') }}</p>
         </div>
 
-        <div class="mt-6 grid grid-cols-1 gap-3">
+        <div class="mt-6 wallet-stack space-y-3">
             @foreach ($accounts as $a)
-                <a href="{{ route('accounts.show', $a) }}" class="rounded-3xl p-4 text-white shadow-lg block tap-anim" style="background: linear-gradient(135deg, {{ $a->color }} 0%, {{ $a->color }}cc 100%);">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-white/25 grid place-items-center">
-                            <x-icon name="{{ $a->type === 'cash' ? 'cash' : ($a->type === 'bank' ? 'bank' : ($a->type === 'card' ? 'card' : ($a->type === 'savings' ? 'piggy' : 'mobile'))) }}" :size="24" />
+                <a href="{{ route('accounts.show', $a) }}" class="wallet-card block tap-anim" style="background: linear-gradient(135deg, {{ $a->color }} 0%, {{ $a->color }}99 60%, {{ $a->color }}cc 100%);">
+                    <div class="flex items-start justify-between relative">
+                        <div class="w-11 h-11 rounded-xl bg-white/20 grid place-items-center backdrop-blur">
+                            <x-icon name="{{ $a->type === 'cash' ? 'cash' : ($a->type === 'bank' ? 'bank' : ($a->type === 'card' ? 'card' : ($a->type === 'savings' ? 'piggy' : 'mobile'))) }}" :size="20" />
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm opacity-85 truncate">{{ $a->institution ?: ucfirst($a->type) }}</p>
-                            <p class="font-bold truncate">{{ $a->name }}</p>
-                        </div>
-                        <div class="text-end">
-                            <p class="text-2xl font-extrabold">{{ number_format($a->current_balance, 0) }}</p>
-                            <p class="text-[11px] opacity-80">{{ $a->currency }}</p>
-                        </div>
+                        <span class="chip-on">{{ $a->currency }}</span>
+                    </div>
+                    <p class="text-[11px] text-white/75 mt-7 relative">{{ $a->institution ?: ucfirst($a->type) }}</p>
+                    <div class="flex items-end justify-between mt-1 relative">
+                        <p class="font-semibold text-lg truncate">{{ $a->name }}</p>
+                        <p class="display-amount text-2xl num">{{ number_format($a->current_balance, 0) }}</p>
                     </div>
                 </a>
             @endforeach
-        </div>
 
-        <a href="{{ route('accounts.create') }}" class="btn-primary mt-6 flex items-center justify-center gap-2">
-            <x-icon name="plus" :size="18" /> محفظة جديدة
-        </a>
+            <a href="{{ route('accounts.create') }}" class="glass-soft block rounded-3xl p-5 grid place-items-center text-white/60">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-white/10 grid place-items-center">
+                        <x-icon name="plus" :size="16" />
+                    </div>
+                    <span class="font-semibold text-sm">{{ __('app.wallet_new') }}</span>
+                </div>
+            </a>
+        </div>
     </div>
 </x-layouts.app>

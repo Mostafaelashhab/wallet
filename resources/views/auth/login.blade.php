@@ -1,80 +1,64 @@
-<x-layouts.app :title="__('app.login')" hero="tall">
-    <div class="safe-top px-5 pt-3 text-white">
+<x-layouts.app :title="__('app.login')">
+    <div class="safe-top px-5 pt-3">
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 text-white">
                 <div class="w-9 h-9 rounded-full bg-white grid place-items-center">
-                    <span class="text-brand-500 font-extrabold">S</span>
+                    <span class="text-ink-950 font-extrabold">S</span>
                 </div>
                 <span class="font-extrabold text-xl tracking-tight">Splitty</span>
             </div>
-            <div class="text-xs space-x-2">
-                <button onclick="toggleLocale('ar')" class="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur">عربي</button>
-                <button onclick="toggleLocale('en')" class="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur">EN</button>
+            <div class="text-xs flex items-center gap-2">
+                <a href="/locale/ar?redirect=/login" class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-white">عربي</a>
+                <a href="/locale/en?redirect=/login" class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-white">EN</a>
             </div>
         </div>
 
-        <div class="mt-8 text-white">
-            <h1 class="text-3xl font-extrabold leading-tight">قسّم الفواتير،<br>وانسى الحسابات.</h1>
-            <p class="opacity-85 mt-2 text-sm leading-6">رحلات، عشا، إيجار، اشتراكات — Splitty بيحسبها كلها ويقول مين عليه كام بأقل عدد تحويلات.</p>
-        </div>
-
-        {{-- Floating preview cards (visual interest) --}}
-        <div class="relative mt-6 h-16">
-            <div class="absolute inset-x-2 top-0 bg-white/20 backdrop-blur rounded-2xl p-3 flex items-center gap-3 -rotate-2">
-                <div class="w-9 h-9 rounded-xl bg-emerald-200 grid place-items-center text-emerald-700">
-                    <x-icon name="check" :size="18" />
-                </div>
-                <div class="flex-1 text-xs">
-                    <p class="font-semibold">سددت لـ Wade</p>
-                    <p class="opacity-70">2,501.32 EGP عبر InstaPay</p>
-                </div>
-            </div>
+        <div class="mt-12 text-white">
+            <h1 class="text-3xl font-extrabold leading-tight tracking-tight">{{ __('app.app_tagline') }}</h1>
+            <p class="opacity-60 mt-2 text-sm leading-6">{{ app()->getLocale() === 'ar' ? 'تتبع كل مصروفاتك ودخلك في مكان واحد. بسيط، سريع، وكل البيانات معاك.' : 'Track every expense and income in one place. Simple, fast, all your data with you.' }}</p>
         </div>
     </div>
 
-    <div class="px-5 mt-6">
-        <div class="card p-6 rounded-3xl">
-            <h2 class="text-lg font-extrabold mb-1">{{ __('app.login') }}</h2>
-            <p class="text-sm text-stone-500 mb-4">سجّل دخول وكمّل الحسابات مع صحابك.</p>
+    <div class="px-5 mt-8">
+        <div class="glass p-6 rounded-3xl">
+            <h2 class="text-lg font-bold mb-1 text-white">{{ __('app.login') }}</h2>
+            <p class="text-sm text-white/55 mb-4">{{ __('app.login_subtitle') }}</p>
             <form method="POST" action="{{ route('login') }}" class="space-y-3">
                 @csrf
                 <div>
-                    <label class="text-xs font-bold text-stone-600">{{ __('app.email') }}</label>
-                    <input type="email" name="email" required value="{{ old('email', 'devuser1@esystematic.org') }}" class="input mt-1" autofocus>
-                    @error('email') <p class="text-rose-600 text-xs mt-1">{{ $message }}</p> @enderror
+                    <label class="text-xs font-semibold text-white/70">{{ __('app.email') }}</label>
+                    <input type="email" name="email" required value="{{ old('email') }}" class="input mt-1" autofocus>
+                    @error('email') <p class="text-rose-400 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-stone-600">{{ __('app.password') }}</label>
-                    <input type="password" name="password" required class="input mt-1" placeholder="password">
+                    <label class="text-xs font-semibold text-white/70">{{ __('app.password') }}</label>
+                    <input type="password" name="password" required class="input mt-1">
                 </div>
-                <label class="flex items-center gap-2 text-sm text-stone-700">
-                    <input type="checkbox" name="remember" value="1" class="w-4 h-4 accent-orange-500">
+                <label class="flex items-center gap-2 text-sm text-white/70">
+                    <input type="checkbox" name="remember" value="1" class="w-4 h-4 accent-indigo-500">
                     {{ __('app.remember_me') }}
                 </label>
                 <button class="btn-primary mt-2">{{ __('app.continue') }}</button>
             </form>
-            <p class="text-center mt-4 text-sm text-stone-600">
+            <p class="text-center mt-4 text-sm text-white/55">
                 {{ __('app.no_account') }}
-                <a href="{{ route('register') }}" class="text-brand-600 font-semibold">{{ __('app.register') }}</a>
+                <a href="{{ route('register') }}" class="text-indigo-300 font-semibold">{{ __('app.register') }}</a>
             </p>
         </div>
 
-        {{-- Feature highlight strip --}}
         <div class="grid grid-cols-3 gap-2 mt-5">
-            <div class="card !p-3 text-center">
-                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-orange-100 text-brand-600"><x-icon name="mic" :size="18" /></div>
-                <p class="text-[11px] mt-2 font-semibold leading-tight">سجّل بصوتك</p>
+            <div class="glass-soft !p-3 text-center rounded-2xl">
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-indigo-500/20 text-indigo-200 border border-indigo-400/20"><x-icon name="mic" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold text-white/80 leading-tight">{{ app()->getLocale() === 'ar' ? 'سجّل بصوتك' : 'Voice entry' }}</p>
             </div>
-            <div class="card !p-3 text-center">
-                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-sky-100 text-sky-600"><x-icon name="camera" :size="18" /></div>
-                <p class="text-[11px] mt-2 font-semibold leading-tight">OCR للإيصال</p>
+            <div class="glass-soft !p-3 text-center rounded-2xl">
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-sky-500/20 text-sky-200 border border-sky-400/20"><x-icon name="camera" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold text-white/80 leading-tight">{{ app()->getLocale() === 'ar' ? 'إيصال OCR' : 'Receipt OCR' }}</p>
             </div>
-            <div class="card !p-3 text-center">
-                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-emerald-100 text-emerald-600"><x-icon name="sparkles" :size="18" /></div>
-                <p class="text-[11px] mt-2 font-semibold leading-tight">تبسيط الديون</p>
+            <div class="glass-soft !p-3 text-center rounded-2xl">
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-emerald-500/20 text-emerald-200 border border-emerald-400/20"><x-icon name="chart" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold text-white/80 leading-tight">{{ app()->getLocale() === 'ar' ? 'تقارير ذكية' : 'Smart reports' }}</p>
             </div>
         </div>
-
-        <p class="text-center text-stone-400 text-[11px] mt-5">جربه الآن: <code class="text-stone-600">devuser1@esystematic.org / password</code></p>
     </div>
 </x-layouts.app>

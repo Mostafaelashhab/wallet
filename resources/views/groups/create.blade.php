@@ -1,4 +1,4 @@
-<x-layouts.app title="مجموعة جديدة" hero="short">
+<x-layouts.app title="مجموعة جديدة">
     <x-header-bar title="مجموعة جديدة" :back="route('groups.index')" />
 
     <div class="px-5">

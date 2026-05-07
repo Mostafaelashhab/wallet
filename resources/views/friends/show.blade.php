@@ -1,4 +1,4 @@
-<x-layouts.app :title="$user->name" hero="short">
+<x-layouts.app :title="$user->name">
     <x-header-bar :title="$user->name" :back="route('friends.index')" />
 
     <div class="px-5">

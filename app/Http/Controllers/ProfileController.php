@@ -37,9 +37,10 @@ class ProfileController extends Controller
             unset($data['password']);
         }
         $me->update($data);
+        $response = back()->with('flash', 'Profile updated');
         if (!empty($data['locale'])) {
-            cookie()->queue('app_locale', $data['locale'], 60 * 24 * 365);
+            $response = $response->withCookie(cookie()->forever('app_locale', $data['locale'], '/', null, false, false));
         }
-        return back()->with('flash', 'Profile updated');
+        return $response;
     }
 }

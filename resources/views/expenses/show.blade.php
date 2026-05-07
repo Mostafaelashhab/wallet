@@ -1,4 +1,4 @@
-<x-layouts.app :title="$expense->description" hero="short">
+<x-layouts.app :title="$expense->description">
     <x-header-bar :title="$expense->description" :back="route('dashboard')" />
 
     <div class="px-5">

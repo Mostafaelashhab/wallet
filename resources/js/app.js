@@ -33,10 +33,10 @@ document.addEventListener('click', (e) => {
     );
 });
 
-// 4. Locale + RTL toggler (cookie-based, server reads it)
+// 4. Locale + RTL toggler (server-side route sets cookie + redirects back)
 window.toggleLocale = (locale) => {
-    document.cookie = `app_locale=${locale};path=/;max-age=${60 * 60 * 24 * 365}`;
-    location.reload();
+    const here = encodeURIComponent(location.pathname + location.search);
+    location.assign(`/locale/${locale}?redirect=${here}`);
 };
 
 // 5. Voice input (Web Speech API)
