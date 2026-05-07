@@ -13,8 +13,6 @@
 /.vscode
 /.zed
 /auth.json
-
-/storage/*.key
 /storage/pail
 /vendor
 _ide_helper.php
