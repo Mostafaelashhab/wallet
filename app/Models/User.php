@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'avatar', 'phone', 'locale', 'currency', 'instapay_handle', 'vodafone_cash', 'color'])]
+#[Fillable(['name', 'email', 'password', 'avatar', 'phone', 'locale', 'currency', 'instapay_handle', 'vodafone_cash', 'color', 'onboarded_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -22,8 +22,29 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'onboarded_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class)->where('active', true);
+    }
+
+    public function recurringTransactions(): HasMany
+    {
+        return $this->hasMany(RecurringTransaction::class)->where('active', true);
+    }
+
+    public function netWorthSnapshots(): HasMany
+    {
+        return $this->hasMany(NetWorthSnapshot::class)->orderBy('date');
     }
 
     public function groups(): BelongsToMany

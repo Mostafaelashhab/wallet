@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('recurring:run')->dailyAt('02:00');
+Schedule::command('splitty:daily-tasks')->dailyAt('02:30');

@@ -12,11 +12,26 @@ class TransactionController extends Controller
 {
     public function index(Request $request)
     {
-        $type = $request->query('type'); // expense, income, transfer
-        $q = $request->user()->transactions()->with('account', 'transferToAccount', 'category');
-        if (in_array($type, ['expense','income','transfer'])) $q->where('type', $type);
-        $transactions = $q->take(120)->get();
-        return view('transactions.index', compact('transactions', 'type'));
+        $type = $request->query('type');
+        $q = $request->query('q');
+        $from = $request->query('from');
+        $to = $request->query('to');
+        $accountId = $request->query('account');
+        $categoryId = $request->query('cat');
+
+        $query = $request->user()->transactions()->with('account', 'transferToAccount', 'category');
+        if (in_array($type, ['expense','income','transfer'])) $query->where('type', $type);
+        if ($q) $query->where('description', 'like', '%' . $q . '%');
+        if ($from) $query->whereDate('occurred_at', '>=', $from);
+        if ($to) $query->whereDate('occurred_at', '<=', $to);
+        if ($accountId) $query->where('account_id', $accountId);
+        if ($categoryId) $query->where('category_id', $categoryId);
+
+        $transactions = $query->take(150)->get();
+        $accounts = $request->user()->accounts()->get();
+        $categories = Category::all();
+
+        return view('transactions.index', compact('transactions', 'type', 'q', 'from', 'to', 'accountId', 'categoryId', 'accounts', 'categories'));
     }
 
     public function create(Request $request)
@@ -28,10 +43,7 @@ class TransactionController extends Controller
             $accounts = $request->user()->accounts()->get();
         }
         $categories = Category::query()
-            ->where(function ($q) use ($type) {
-                $q->whereIn('kind', [$type === 'income' ? 'income' : 'expense', 'both']);
-            })
-            ->get();
+            ->whereIn('kind', [$type === 'income' ? 'income' : 'expense', 'both'])->get();
         return view('transactions.create', compact('type', 'accounts', 'categories'));
     }
 
@@ -52,10 +64,10 @@ class TransactionController extends Controller
             'location_name' => ['nullable', 'string', 'max:200'],
         ]);
         $me = $request->user();
-        $account = Account::where('user_id', $me->id)->findOrFail($data['account_id']);
+        Account::where('user_id', $me->id)->findOrFail($data['account_id']);
         if ($data['type'] === 'transfer') {
-            abort_unless($data['transfer_to_account_id'] ?? null, 422, 'Transfer destination required');
-            $to = Account::where('user_id', $me->id)->findOrFail($data['transfer_to_account_id']);
+            abort_unless($data['transfer_to_account_id'] ?? null, 422);
+            Account::where('user_id', $me->id)->findOrFail($data['transfer_to_account_id']);
         }
         if ($data['type'] === 'expense' && !($data['category_id'] ?? null)) {
             $cat = Category::detect($data['description']);
@@ -64,18 +76,16 @@ class TransactionController extends Controller
         if ($request->hasFile('attachment')) {
             $data['attachment_path'] = $request->file('attachment')->store('attachments', 'public');
         }
-
         $tx = Transaction::create(['user_id' => $me->id, ...$data]);
-
         Activity::log('tx.' . $tx->type, [
             'amount' => (float) $tx->amount, 'currency' => $tx->currency,
-            'description' => $tx->description, 'account' => $account->name,
+            'description' => $tx->description,
+            'account' => Account::find($tx->account_id)?->name,
         ]);
-
         return redirect()->route('dashboard')->with('flash', match ($tx->type) {
-            'income' => 'تم تسجيل الدخل ✓',
-            'transfer' => 'تم تسجيل التحويل ✓',
-            default => 'تم تسجيل المصروف ✓',
+            'income' => __('app.tx_saved_income'),
+            'transfer' => __('app.tx_saved_transfer'),
+            default => __('app.tx_saved_expense'),
         });
     }
 
@@ -90,6 +100,40 @@ class TransactionController extends Controller
     {
         abort_unless($transaction->user_id === $request->user()->id, 403);
         $transaction->delete();
-        return redirect()->route('dashboard')->with('flash', 'Deleted');
+        return redirect()->route('dashboard')->with('flash', __('app.deleted'));
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $from = $request->query('from') ?: now()->startOfMonth()->toDateString();
+        $to = $request->query('to') ?: now()->endOfMonth()->toDateString();
+        $rows = $request->user()->transactions()->with('account', 'category', 'transferToAccount')
+            ->whereDate('occurred_at', '>=', $from)
+            ->whereDate('occurred_at', '<=', $to)
+            ->orderBy('occurred_at')->get();
+
+        $filename = "splitty-{$from}-to-{$to}.csv";
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+        return response()->stream(function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // BOM for Excel UTF-8
+            fputcsv($out, ['Date', 'Type', 'Description', 'Category', 'Account', 'To Account', 'Amount', 'Currency']);
+            foreach ($rows as $t) {
+                fputcsv($out, [
+                    $t->occurred_at->toDateTimeString(),
+                    $t->type,
+                    $t->description,
+                    $t->category?->name() ?? '',
+                    $t->account?->name ?? '',
+                    $t->transferToAccount?->name ?? '',
+                    number_format((float) $t->amount, 2, '.', ''),
+                    $t->currency,
+                ]);
+            }
+            fclose($out);
+        }, 200, $headers);
     }
 }
