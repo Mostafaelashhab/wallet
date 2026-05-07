@@ -21,7 +21,9 @@
         {{-- Floating preview cards (visual interest) --}}
         <div class="relative mt-6 h-16">
             <div class="absolute inset-x-2 top-0 bg-white/20 backdrop-blur rounded-2xl p-3 flex items-center gap-3 -rotate-2">
-                <div class="w-9 h-9 rounded-xl bg-emerald-200 grid place-items-center">✅</div>
+                <div class="w-9 h-9 rounded-xl bg-emerald-200 grid place-items-center text-emerald-700">
+                    <x-icon name="check" :size="18" />
+                </div>
                 <div class="flex-1 text-xs">
                     <p class="font-semibold">سددت لـ Wade</p>
                     <p class="opacity-70">2,501.32 EGP عبر InstaPay</p>
@@ -60,16 +62,16 @@
         {{-- Feature highlight strip --}}
         <div class="grid grid-cols-3 gap-2 mt-5">
             <div class="card !p-3 text-center">
-                <div class="text-2xl">🎙️</div>
-                <p class="text-[11px] mt-1 font-semibold leading-tight">سجّل المصروف بصوتك</p>
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-orange-100 text-brand-600"><x-icon name="mic" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold leading-tight">سجّل بصوتك</p>
             </div>
             <div class="card !p-3 text-center">
-                <div class="text-2xl">📷</div>
-                <p class="text-[11px] mt-1 font-semibold leading-tight">صوّر الإيصال يقرأه</p>
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-sky-100 text-sky-600"><x-icon name="camera" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold leading-tight">OCR للإيصال</p>
             </div>
             <div class="card !p-3 text-center">
-                <div class="text-2xl">⚡</div>
-                <p class="text-[11px] mt-1 font-semibold leading-tight">تبسيط الديون تلقائي</p>
+                <div class="w-9 h-9 mx-auto rounded-2xl grid place-items-center bg-emerald-100 text-emerald-600"><x-icon name="sparkles" :size="18" /></div>
+                <p class="text-[11px] mt-2 font-semibold leading-tight">تبسيط الديون</p>
             </div>
         </div>
 

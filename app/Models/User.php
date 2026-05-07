@@ -73,6 +73,54 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class);
     }
 
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(Account::class)->whereNull('archived_at')->orderBy('id');
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class)->orderByDesc('occurred_at');
+    }
+
+    public function netWorth(): float
+    {
+        return (float) $this->accounts()->where('include_in_total', true)->get()->sum(fn ($a) => $a->balance());
+    }
+
+    public function monthSummary(?\Carbon\CarbonInterface $month = null): array
+    {
+        $month = $month ?? now();
+        $start = $month->copy()->startOfMonth();
+        $end   = $month->copy()->endOfMonth();
+        $income = (float) Transaction::where('user_id', $this->id)
+            ->where('type', 'income')
+            ->whereBetween('occurred_at', [$start, $end])->sum('amount');
+        $expense = (float) Transaction::where('user_id', $this->id)
+            ->where('type', 'expense')
+            ->whereBetween('occurred_at', [$start, $end])->sum('amount');
+        return ['income' => $income, 'expense' => $expense, 'net' => $income - $expense];
+    }
+
+    public function ensureDefaultAccounts(): void
+    {
+        if ($this->accounts()->count() > 0) return;
+        $defs = [
+            ['name' => 'كاش',           'type' => 'cash',   'icon' => '💵', 'color' => '#16A34A', 'institution' => null],
+            ['name' => 'حساب بنكي',     'type' => 'bank',   'icon' => '🏦', 'color' => '#3B82F6', 'institution' => null],
+            ['name' => 'فودافون كاش',   'type' => 'wallet', 'icon' => '📱', 'color' => '#EF4444', 'institution' => 'Vodafone Cash'],
+            ['name' => 'إنستا باي',     'type' => 'wallet', 'icon' => '🟣', 'color' => '#8B5CF6', 'institution' => 'InstaPay'],
+        ];
+        foreach ($defs as $d) {
+            Account::create([
+                'user_id' => $this->id,
+                'currency' => $this->currency ?? 'EGP',
+                'opening_balance' => 0,
+                ...$d,
+            ]);
+        }
+    }
+
     public function avatarUrl(): string
     {
         if ($this->avatar) {

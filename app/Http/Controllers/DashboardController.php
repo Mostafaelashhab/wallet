@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Expense;
-use App\Models\ExpenseSplit;
-use App\Models\Group;
-use App\Models\Payment;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -13,40 +10,28 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $me = $request->user();
+        $me->ensureDefaultAccounts();
 
-        $owedToMe = (float) ExpenseSplit::query()
-            ->whereHas('expense', fn ($q) => $q->where('payer_id', $me->id))
-            ->where('user_id', '!=', $me->id)
-            ->whereNull('settled_at')
-            ->sum('amount');
+        $accounts = $me->accounts()->get()->each(fn ($a) => $a->current_balance = $a->balance());
+        $netWorth = $accounts->where('include_in_total', true)->sum->current_balance;
+        $monthSummary = $me->monthSummary();
 
-        $iOwe = (float) ExpenseSplit::query()
-            ->whereHas('expense', fn ($q) => $q->where('payer_id', '!=', $me->id))
-            ->where('user_id', $me->id)
-            ->whereNull('settled_at')
-            ->sum('amount');
+        $recentTx = Transaction::where('user_id', $me->id)
+            ->with('account', 'category', 'transferToAccount')
+            ->latest('occurred_at')->take(8)->get();
 
-        $paymentsToMe = (float) Payment::where('payee_id', $me->id)->sum('amount');
-        $paymentsByMe = (float) Payment::where('payer_id', $me->id)->sum('amount');
-
-        $owedToMe = max(0, $owedToMe - $paymentsToMe);
-        $iOwe = max(0, $iOwe - $paymentsByMe);
-
-        $groups = $me->groups()->with('owner')->take(8)->get()->map(function ($g) use ($me) {
+        // Group/friends section (kept as a secondary panel)
+        $groups = $me->groups()->take(4)->get()->map(function ($g) use ($me) {
             $g->my_balance = $g->balanceFor($me);
             return $g;
         });
 
-        $friends = $me->friends()->take(8)->get()->map(function ($f) use ($me) {
-            $f->balance_with_me = $me->balanceWith($f);
-            return $f;
-        });
-
         return view('dashboard', [
-            'owedToMe' => $owedToMe,
-            'iOwe' => $iOwe,
+            'accounts' => $accounts,
+            'netWorth' => $netWorth,
+            'monthSummary' => $monthSummary,
+            'recentTx' => $recentTx,
             'groups' => $groups,
-            'friends' => $friends,
         ]);
     }
 }

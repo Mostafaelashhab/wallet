@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class Group extends Model
 {
-    protected $fillable = ['name', 'slug', 'owner_id', 'icon', 'color', 'currency', 'simplify_debts'];
+    protected $fillable = ['name', 'slug', 'owner_id', 'icon', 'icon_name', 'color', 'currency', 'simplify_debts'];
 
     protected $casts = [
         'simplify_debts' => 'bool',

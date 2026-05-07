@@ -1,4 +1,4 @@
-<x-layouts.app :title="$user->name">
+<x-layouts.app :title="$user->name" hero="short">
     <x-header-bar :title="$user->name" :back="route('friends.index')" />
 
     <div class="px-5">
@@ -28,7 +28,9 @@
         <div class="space-y-3">
             @forelse ($expenses as $exp)
                 <a href="{{ route('expenses.show', $exp) }}" class="card flex items-center gap-3 tap-anim">
-                    <div class="w-11 h-11 rounded-2xl grid place-items-center text-2xl" style="background: {{ ($exp->category->color ?? '#FF6B35') }}22">{{ $exp->category->icon ?? '💸' }}</div>
+                    <div class="w-11 h-11 rounded-2xl grid place-items-center text-white shrink-0" style="background: {{ $exp->category->color ?? '#FF6B35' }}">
+                        <x-icon name="{{ $exp->category->icon_name ?? 'other' }}" :size="20" />
+                    </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold truncate">{{ $exp->description }}</p>
                         <p class="text-xs text-stone-500">{{ $exp->payer->name }} · {{ $exp->occurred_at->translatedFormat('M j') }}</p>

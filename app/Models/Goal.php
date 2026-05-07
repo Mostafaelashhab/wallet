@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Goal extends Model
 {
-    protected $fillable = ['group_id', 'owner_id', 'name', 'target_amount', 'currency', 'deadline', 'icon', 'color'];
+    protected $fillable = ['group_id', 'owner_id', 'name', 'target_amount', 'currency', 'deadline', 'icon', 'icon_name', 'color'];
 
     protected $casts = [
         'deadline' => 'date',

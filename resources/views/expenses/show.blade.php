@@ -1,15 +1,15 @@
-<x-layouts.app :title="$expense->description">
+<x-layouts.app :title="$expense->description" hero="short">
     <x-header-bar :title="$expense->description" :back="route('dashboard')" />
 
     <div class="px-5">
         <div class="card text-center">
-            <div class="w-16 h-16 mx-auto rounded-3xl grid place-items-center text-3xl" style="background: {{ ($expense->category->color ?? '#FF6B35') }}22">
-                {{ $expense->category->icon ?? '💸' }}
+            <div class="w-16 h-16 mx-auto rounded-3xl grid place-items-center text-white" style="background: {{ $expense->category->color ?? '#FF6B35' }}">
+                <x-icon name="{{ $expense->category->icon_name ?? 'other' }}" :size="28" />
             </div>
-            <p class="text-3xl font-bold mt-3">{{ number_format($expense->amount, 2) }} <span class="text-sm font-medium text-stone-500">{{ $expense->currency }}</span></p>
+            <p class="text-3xl font-extrabold mt-3">{{ number_format($expense->amount, 2) }} <span class="text-sm font-medium text-stone-500">{{ $expense->currency }}</span></p>
             <p class="text-stone-500 text-sm mt-1">{{ __('app.paid_by') }} <strong>{{ $expense->payer->name }}</strong> · {{ $expense->occurred_at->translatedFormat('M j, Y · H:i') }}</p>
             @if ($expense->location_name)
-                <p class="text-stone-400 text-xs mt-1">📍 {{ $expense->location_name }}</p>
+                <p class="text-stone-400 text-xs mt-1 inline-flex items-center gap-1"><x-icon name="pin" :size="12" /> {{ $expense->location_name }}</p>
             @endif
         </div>
 
@@ -57,7 +57,9 @@
         @if ($expense->payer_id === auth()->id())
             <form method="POST" action="{{ route('expenses.destroy', $expense) }}" onsubmit="return confirm('حذف المصروف؟')" class="mt-4">
                 @csrf @method('DELETE')
-                <button class="w-full py-3 rounded-2xl bg-rose-50 text-rose-600 font-semibold">{{ __('app.delete') }}</button>
+                <button class="w-full py-3 rounded-2xl bg-rose-50 text-rose-600 font-semibold flex items-center justify-center gap-2">
+                    <x-icon name="trash" :size="18" /> {{ __('app.delete') }}
+                </button>
             </form>
         @endif
     </div>
